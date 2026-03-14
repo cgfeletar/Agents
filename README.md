@@ -16,43 +16,42 @@ flowchart TD
     USER([👤 User: Feature Spec / Ticket])
     USER --> ORC
 
-    ORC["🎯 ORCHESTRATOR\n(claude-haiku)\nCoordinates pipeline,\ncreates spec.md"]
+    ORC["🎯 ORCHESTRATOR<br/>(claude-haiku)<br/>Coordinates pipeline,<br/>creates spec.md"]
     ORC --> PRE
 
-    PRE{{"Pre-flight Validation\nConfirms: module, components,\ndata fetching, design constraints"}}
+    PRE{{"Pre-flight Validation<br/>Confirms: module, components,<br/>data fetching, design constraints"}}
     PRE --> ANA
 
-    ANA["🔍 COMPONENT ANALYST\n(claude-sonnet · read-only)\nDiscovers conventions, scans reusables,\nclassifies: REUSE / ADAPT / WRITE NEW\n→ writes analyst-report.md"]
+    ANA["🔍 COMPONENT ANALYST<br/>(claude-sonnet · read-only)<br/>Discovers conventions, scans reusables,<br/>classifies: REUSE / ADAPT / WRITE NEW<br/>→ writes analyst-report.md"]
     ANA --> GATE1
 
-    GATE1{{"👤 User Approval Gate 1\nReview: classifications,\nhigh-risk ADAPTs, style conflicts"}}
+    GATE1{{"👤 User Approval Gate 1<br/>Review: classifications,<br/>high-risk ADAPTs, style conflicts"}}
     GATE1 --> IMP
 
-    IMP["⚙️ COMPONENT IMPLEMENTATION\n(claude-sonnet · writes code)\nREUSE → import as-is\nADAPT → protective tests + minimal changes\nWRITE NEW → scaffold + implement\n\nIf 3+ components: runs parallel agents"]
+    IMP["⚙️ COMPONENT IMPLEMENTATION<br/>(claude-sonnet · writes code)<br/>REUSE → import as-is<br/>ADAPT → protective tests + minimal changes<br/>WRITE NEW → scaffold + implement<br/><br/>If 3+ components: runs parallel agents"]
     IMP --> LINT
 
-    LINT{{"🔒 Lint / TS Hard Gate\neslint + tsc --noEmit\nAuto-fixes where possible\nBlocks on errors"}}
+    LINT{{"🔒 Lint / TS Hard Gate<br/>eslint + tsc --noEmit<br/>Auto-fixes where possible<br/>Blocks on errors"}}
     LINT --> TEST
 
-    TEST["🧪 COMPONENT TEST\n(claude-sonnet · writes tests)\nRuns existing tests, writes new tests\n80%+ coverage target · max 5 attempts/file\n→ writes test-report.md"]
+    TEST["🧪 COMPONENT TEST<br/>(claude-sonnet · writes tests)<br/>Runs existing tests, writes new tests<br/>80%+ coverage target · max 5 attempts/file<br/>→ writes test-report.md"]
     TEST --> REV
 
-    REV["🔎 CODE REVIEWER\n(claude-opus · read-only)\nContract verification, correctness,\ntype safety, quality audit\n→ writes review-report.md\n→ Verdict: Ready / Needs Follow-up / Blocked"]
+    REV["🔎 CODE REVIEWER<br/>(claude-opus · read-only)<br/>Contract verification, correctness,<br/>type safety, quality audit<br/>→ writes review-report.md<br/>→ Verdict: Ready / Needs Follow-up / Blocked"]
     REV --> LOOP
 
-    LOOP{"P0/P1 Re-plan Loop\n✅ Ready or P2s only → Gate 2\n⚠️ P1s or 🚫 P0s → re-run\nMax 2 iterations then surface to user"}
-    LOOP -->|"P0/P1 found\n(iteration < 2)"| IMP
-    LOOP -->|"Ready or P2s only\nor max iterations hit"| GATE2
+    LOOP{"P0/P1 Re-plan Loop<br/>✅ Ready or P2s only → Gate 2<br/>⚠️ P1s or 🚫 P0s → re-run<br/>Max 2 iterations then surface to user"}
+    LOOP -->|"P0/P1 found<br/>(iteration < 2)"| IMP
+    LOOP -->|"Ready or P2s only<br/>or max iterations hit"| GATE2
 
-    GATE2{{"👤 User Approval Gate 2\nReview: merge readiness,\nremaining P2s, test coverage"}}
+    GATE2{{"👤 User Approval Gate 2<br/>Review: merge readiness,<br/>remaining P2s, test coverage"}}
     GATE2 --> LESSONS
 
-    LESSONS["📝 Lessons Capture\nOrchestrator scans all reports\nfor patterns → appends to lessons.md"]
+    LESSONS["📝 Lessons Capture<br/>Orchestrator scans all reports<br/>for patterns → appends to lessons.md"]
     LESSONS --> DONE
 
     DONE([✅ Done])
 ```
-
 ---
 
 ## Agents
