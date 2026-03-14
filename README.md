@@ -70,6 +70,25 @@ flowchart TD
 | Component Test | claude-sonnet | Writes and iterates on tests | Yes |
 | Code Reviewer | claude-opus | Full audit, issues verdict | No |
 
+## Skills
+
+Preloaded context documents injected into agents that need them.
+
+| Skill | Description |
+|---|---|
+| `accessibility` | Patterns and requirements for building accessible components (ARIA, keyboard nav, screen reader support) |
+| `anti-patterns` | Common frontend anti-patterns to avoid during implementation and review |
+| `component-library` | Conventions and usage patterns for the project's component library |
+| `styling` | Styling rules, design token usage, and CSS/class naming conventions |
+
+## Refs
+
+Reference documents available to agents for project-specific context.
+
+| Ref | Description |
+|---|---|
+| `typescript` | TypeScript patterns, type conventions, and project-specific TS guidelines |
+
 ---
 
 ## Design Decisions
