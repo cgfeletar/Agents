@@ -22,7 +22,7 @@ flowchart TD
     PRE{{"Pre-flight Validation<br/>Confirms: module, components,<br/>data fetching, design constraints"}}
     PRE --> ANA
 
-    ANA["🔍 COMPONENT ANALYST<br/>(claude-sonnet · read-only)<br/>Discovers conventions, scans reusables,<br/>classifies: REUSE / ADAPT / WRITE NEW<br/>→ writes analyst-report.md"]
+    ANA["🔍 COMPONENT ANALYST<br/>(claude-sonnet · read-only)<br/>Classifies: REUSE / ADAPT / WRITE NEW<br/>→ writes analyst-report.md"]
     ANA --> GATE1
 
     GATE1{{"👤 User Approval Gate 1<br/>Review: classifications,<br/>high-risk ADAPTs, style conflicts"}}
@@ -31,19 +31,19 @@ flowchart TD
     SK_IMP["📚 Skills<br/>anti-patterns · accessibility<br/>component-library · styling"]
     SK_IMP -.-> IMP
 
-    IMP["⚙️ COMPONENT IMPLEMENTATION<br/>(claude-sonnet · writes code)<br/>REUSE → import as-is<br/>ADAPT → protective tests + minimal changes<br/>WRITE NEW → scaffold + implement<br/><br/>If 3+ components: runs parallel agents"]
+    IMP["⚙️ COMPONENT IMPLEMENTATION<br/>(claude-sonnet · writes code)<br/>Implements components<br/><br/>If 3+ components: runs parallel agents"]
     IMP --> LINT
 
     LINT{{"🔒 Lint / TS Hard Gate<br/>eslint + tsc --noEmit<br/>Auto-fixes where possible<br/>Blocks on errors"}}
     LINT --> TEST
 
-    TEST["🧪 COMPONENT TEST<br/>(claude-sonnet · writes tests)<br/>Runs existing tests, writes new tests<br/>80%+ coverage target · max 5 attempts/file<br/>→ writes test-report.md"]
+    TEST["🧪 COMPONENT TEST<br/>(claude-sonnet · writes tests)<br/>80%+ coverage target/file<br/>→ writes test-report.md"]
     TEST --> REV
 
     SK_REV["📚 Skills<br/>anti-patterns · accessibility · styling"]
     SK_REV -.-> REV
 
-    REV["🔎 CODE REVIEWER<br/>(claude-opus · read-only)<br/>Contract verification, correctness,<br/>type safety, quality audit<br/>→ writes review-report.md<br/>→ Verdict: Ready / Needs Follow-up / Blocked"]
+    REV["🔎 CODE REVIEWER<br/>(claude-opus · read-only)<br/>→ writes review-report.md<br/>→ Verdict: Ready / Needs Follow-up / Blocked"]
     REV --> LOOP
 
     LOOP{"P0/P1 Re-plan Loop<br/>✅ Ready or P2s only → Gate 2<br/>⚠️ P1s or 🚫 P0s → re-run<br/>Max 2 iterations then surface to user"}
