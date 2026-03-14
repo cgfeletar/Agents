@@ -28,6 +28,9 @@ flowchart TD
     GATE1{{"👤 User Approval Gate 1<br/>Review: classifications,<br/>high-risk ADAPTs, style conflicts"}}
     GATE1 --> IMP
 
+    SK_IMP["📚 Skills<br/>anti-patterns · accessibility<br/>component-library · styling"]
+    SK_IMP -.-> IMP
+
     IMP["⚙️ COMPONENT IMPLEMENTATION<br/>(claude-sonnet · writes code)<br/>REUSE → import as-is<br/>ADAPT → protective tests + minimal changes<br/>WRITE NEW → scaffold + implement<br/><br/>If 3+ components: runs parallel agents"]
     IMP --> LINT
 
@@ -36,6 +39,9 @@ flowchart TD
 
     TEST["🧪 COMPONENT TEST<br/>(claude-sonnet · writes tests)<br/>Runs existing tests, writes new tests<br/>80%+ coverage target · max 5 attempts/file<br/>→ writes test-report.md"]
     TEST --> REV
+
+    SK_REV["📚 Skills<br/>anti-patterns · accessibility · styling"]
+    SK_REV -.-> REV
 
     REV["🔎 CODE REVIEWER<br/>(claude-opus · read-only)<br/>Contract verification, correctness,<br/>type safety, quality audit<br/>→ writes review-report.md<br/>→ Verdict: Ready / Needs Follow-up / Blocked"]
     REV --> LOOP
