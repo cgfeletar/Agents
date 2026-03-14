@@ -37,25 +37,12 @@ Effort-scaling rules matter. Agents struggle to judge appropriate effort. Your o
 
 5. Anti-Patterns to Watch For
    Anti-Pattern Applies to Your Agents?
-   Over-specified CLAUDE.md / agent files — too long = instructions get ignored Your component-implementation.md is quite long (~365 lines). Consider whether some sections could be moved to refs that are loaded on-demand
-   Monolithic prompts (500+ words, multiple concerns) Your code-reviewer has 10 phases in one prompt. Consider whether phases could be separate skills loaded as needed
-   Over-prompting for tool use — "CRITICAL: You MUST..." language causes overtriggering in Claude 4.6 Your agents use appropriate language here
    Excessive subagent spawning — Opus has a "strong predilection for subagents" Worth noting in your orchestrator
-6. Context Engineering (the Meta-Skill)
-   Anthropic frames this as the evolution beyond prompt engineering — "iterative curation decisions made repeatedly throughout agent execution cycles."
 
-Context is finite. Accuracy degrades as tokens accumulate. Your subagent architecture naturally helps here — each agent gets a clean context window.
-
-Just-in-time retrieval beats pre-loading. Rather than stuffing all knowledge into the prompt, maintain lightweight references and let agents fetch what they need at runtime. Your refs pattern supports this if agents only read the ref file when they actually need it.
-
-Keep CLAUDE.md ruthlessly pruned. "If Claude already does it correctly without the instruction, delete the instruction." If Claude keeps ignoring a rule, the file is probably too long.
-
-7. Key Takeaways for Your Agent Suite
+6. Key Takeaways for Your Agent Suite
    Your pipeline architecture is solid — it maps well to Anthropic's recommended orchestrator-workers pattern with validation gates.
 
 Agent prompts could benefit from examples — None of your agents include concrete examples of good vs bad output. Even 1-2 examples in the output format sections would improve consistency.
-
-Watch prompt length — The component-implementation agent is dense. Consider splitting the DATA FETCHING, STYLING, and ACCESSIBILITY sections into separate ref/skill files that are loaded on-demand rather than always in context.
 
 Add maxTurns — Especially for the implementation and test agents, a turn limit prevents runaway loops.
 

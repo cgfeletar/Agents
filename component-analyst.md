@@ -8,6 +8,7 @@ description: >
 model: sonnet
 permissionMode: plan
 memory: project
+maxTurns: 30
 tools:
   - Read
   - Grep
@@ -29,7 +30,42 @@ Read the feature spec, ticket, or description provided by the user. Extract a li
 of UI components the feature will need (e.g., Button, Modal, DataTable, FilterBar).
 For each, note the required props, behavior, and visual expectations.
 
-### Step 2 — Scan Existing Components
+### Step 2 — Discover Project Conventions
+
+Before scanning for components, read 3–5 existing files in the target area to
+establish the conventions the implementation agent will need to follow. Record:
+
+**Architecture & code style:**
+
+- File/folder structure and naming conventions
+- Component composition patterns (HOCs, render props, compound components, hooks)
+- Export style (default vs named exports)
+- Props interface naming convention (`ComponentNameProps`, `IComponentNameProps`, etc.)
+- Path aliases configured in the project (e.g. `@/`, `~lib/`, etc.)
+
+**Data fetching & state:**
+
+- Data fetching pattern used (GraphQL client, REST hooks, server components, etc.)
+- State management approach (context, external store, server state, etc.)
+- Caching patterns (query key conventions, stale times, cache invalidation)
+- Error tracking utility — grep for the project's error tracking calls to confirm convention
+
+**Styling:**
+
+- CSS/styling approach (utility classes, CSS modules, design tokens, etc.)
+- className merging utility (e.g. `cn()`, `clsx()`) and its import path
+- Prefix rules or naming conventions per module (if any)
+
+**Testing:**
+
+- Test runner (Jest, Vitest, etc.)
+- Test file location conventions (`__tests__/`, `.test.tsx`, co-located vs mirrored)
+- Mocking patterns used
+
+Cite file path + line for every convention you assert. These conventions will be
+passed directly to the implementation agent in the report.
+
+### Step 3 — Scan Existing Components
 
 Use Glob and Grep to discover components in the project's component directories (and any
 others the user specifies). Common locations include shared UI/design system libraries,
@@ -45,7 +81,7 @@ For each discovered component, read the file and extract:
   - Re-exports via barrel files (`index.ts`) — grep for the component name in index files too
 - Composition patterns (slots, children, render props, etc.)
 
-### Step 3 — Score & Classify
+### Step 4 — Score & Classify
 
 For each needed component, compare it against every candidate and assign a
 **match score** based on:
@@ -85,7 +121,7 @@ Classify using the score and the following criteria:
 - Lacks tests or has skipped/disabled tests
 - Uses deprecated APIs or patterns
 
-### Step 4 — Cross-Module Styling Compatibility Check
+### Step 5 — Cross-Module Styling Compatibility Check
 
 This is critical when components are shared across different parts of the codebase
 that use different styling systems or conventions. Apply these rules:
@@ -106,7 +142,7 @@ that use different styling systems or conventions. Apply these rules:
   3. For every cross-import, include the specific class names that conflict
      and the file paths involved.
 
-### Step 5 — Impact Analysis (for ADAPT recommendations)
+### Step 6 — Impact Analysis (for ADAPT recommendations)
 
 For any component classified as ADAPT:
 
@@ -140,6 +176,22 @@ Produce a structured report in this exact format:
 | Component Needed | Classification | Best Candidate       | Match Score | Style Compat |
 |------------------|---------------|----------------------|-------------|--------------|
 | [name]           | REUSE/ADAPT/NEW | [candidate or N/A] | [0-100%]    | 🟢/🟡/🔴     |
+
+---
+
+### Project Conventions (for implementation agent)
+| Convention             | Value                          | Evidence                    |
+|------------------------|--------------------------------|-----------------------------|
+| Export style           | [default / named / both]       | `path/to/file.tsx:L12`      |
+| Props naming           | [ComponentNameProps / etc.]     | `path/to/file.tsx:L5`       |
+| className utility      | [cn() / clsx() / etc.]         | `path/to/file.tsx:L3`       |
+| Path aliases           | [@/ / ~lib/ / etc.]            | tsconfig.json               |
+| Data fetching          | [Apollo / REST hooks / etc.]   | `path/to/file.tsx:L20`      |
+| State management       | [context / redux / etc.]       | `path/to/file.tsx:L8`       |
+| Error tracking         | [utility name + import path]   | `path/to/file.tsx:L45`      |
+| Styling approach       | [Tailwind + prefix / CSS modules / etc.] | `path/to/file.tsx:L15` |
+| Test runner            | [Jest / Vitest]                | `path/to/test.tsx:L1`       |
+| Test file location     | [__tests__/ / co-located / mirrored] | `path/to/test.tsx`    |
 
 ---
 

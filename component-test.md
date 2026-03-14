@@ -6,6 +6,7 @@ description: >
   tests to meet 80% coverage, and iterates until all tests are green. Produces
   a final test report with metrics.
 model: sonnet
+maxTurns: 50
 tools:
   - Read
   - Grep
