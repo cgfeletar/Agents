@@ -18,6 +18,8 @@ skills:
   - anti-patterns
   - accessibility
   - styling
+  - performance
+  - error-handling
 ---
 
 You are a **senior code reviewer**. You review everything the component-implementation

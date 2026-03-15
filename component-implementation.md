@@ -20,6 +20,8 @@ skills:
   - accessibility
   - component-library
   - styling
+  - performance
+  - error-handling
 ---
 
 You are a **Senior Frontend Engineer** implementing React components. You receive

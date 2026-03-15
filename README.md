@@ -22,28 +22,28 @@ flowchart TD
     PRE{{"Pre-flight Validation<br/>Confirms: module, components,<br/>data fetching, design constraints"}}
     PRE --> ANA
 
-    ANA["🔍 COMPONENT ANALYST<br/>(claude-sonnet · read-only)<br/>Classifies: REUSE / ADAPT / WRITE NEW<br/>→ writes analyst-report.md"]
+    ANA["🔍 COMPONENT ANALYST<br/>(claude-sonnet · read-only · max 30 turns)<br/>Discovers project conventions<br/>Classifies: REUSE / ADAPT / WRITE NEW<br/>→ writes analyst-report.md"]
     ANA --> GATE1
 
     GATE1{{"👤 User Approval Gate 1<br/>Review: classifications,<br/>high-risk ADAPTs, style conflicts"}}
     GATE1 --> IMP
 
-    SK_IMP["📚 Skills<br/>anti-patterns · accessibility<br/>component-library · styling"]
+    SK_IMP["📚 Skills preloaded<br/>anti-patterns · accessibility<br/>component-library · styling<br/>performance · error-handling"]
     SK_IMP -.-> IMP
 
-    IMP["⚙️ COMPONENT IMPLEMENTATION<br/>(claude-sonnet · writes code)<br/>Implements components<br/><br/>If 3+ components: runs parallel agents"]
+    IMP["⚙️ COMPONENT IMPLEMENTATION<br/>(claude-sonnet · writes code · max 50 turns)<br/>Reads analyst report conventions<br/>Implements per classification<br/><br/>If 3+ components: runs parallel agents"]
     IMP --> LINT
 
     LINT{{"🔒 Lint / TS Hard Gate<br/>eslint + tsc --noEmit<br/>Auto-fixes where possible<br/>Blocks on errors"}}
     LINT --> TEST
 
-    TEST["🧪 COMPONENT TEST<br/>(claude-sonnet · writes tests)<br/>80%+ coverage target/file<br/>→ writes test-report.md"]
+    TEST["🧪 COMPONENT TEST<br/>(claude-sonnet · writes tests · max 50 turns)<br/>80%+ coverage target/file<br/>Max 5 fix iterations per file<br/>→ writes test-report.md"]
     TEST --> REV
 
-    SK_REV["📚 Skills<br/>anti-patterns · accessibility · styling"]
+    SK_REV["📚 Skills preloaded<br/>anti-patterns · accessibility · styling<br/>performance · error-handling"]
     SK_REV -.-> REV
 
-    REV["🔎 CODE REVIEWER<br/>(claude-opus · read-only)<br/>→ writes review-report.md<br/>→ Verdict: Ready / Needs Follow-up / Blocked"]
+    REV["🔎 CODE REVIEWER<br/>(claude-opus · read-only · max 35 turns)<br/>6-phase audit against preloaded skills<br/>→ writes review-report.md<br/>→ Verdict: Ready / Needs Follow-up / Blocked"]
     REV --> LOOP
 
     LOOP{"P0/P1 Re-plan Loop<br/>✅ Ready or P2s only → Gate 2<br/>⚠️ P1s or 🚫 P0s → re-run<br/>Max 2 iterations then surface to user"}
@@ -58,36 +58,44 @@ flowchart TD
 
     DONE([✅ Done])
 ```
+
 ---
 
 ## Agents
 
-| Agent | Model | Role | Write Access |
-|---|---|---|---|
-| Orchestrator | claude-haiku | Coordinates pipeline, creates artifacts | Yes |
-| Component Analyst | claude-sonnet | Discovers conventions, classifies components | No |
-| Component Implementation | claude-sonnet | Writes and adapts components | Yes |
-| Component Test | claude-sonnet | Writes and iterates on tests | Yes |
-| Code Reviewer | claude-opus | Full audit, issues verdict | No |
+| Agent | Model | Max Turns | Role | Write Access |
+|---|---|---|---|---|
+| [orchestrator](orchestrator.md) | claude-haiku | — | Coordinates pipeline, manages state, runs lint/TS gate | Yes |
+| [component-analyst](component-analyst.md) | claude-sonnet | 30 | Discovers project conventions, classifies components as REUSE/ADAPT/WRITE NEW | No |
+| [component-implementation](component-implementation.md) | claude-sonnet | 50 | Implements components per analyst report; runs parallel agents for independent work | Yes |
+| [component-test](component-test.md) | claude-sonnet | 50 | Writes tests to 80% coverage, iterates until green | Yes |
+| [code-reviewer](code-reviewer.md) | claude-opus | 35 | 6-phase audit; issues merge readiness verdict | No |
+| [bug-fixer](bug-fixer.md) | claude-sonnet | 40 | Reproduces bugs, finds root cause, makes minimum fix | Yes |
+
+---
 
 ## Skills
 
-Preloaded context documents injected into agents that need them.
+Preloaded into agents at startup — Claude has access to all rules without needing to fetch files at runtime.
 
-| Skill | Description |
-|---|---|
-| `accessibility` | Patterns and requirements for building accessible components (ARIA, keyboard nav, screen reader support) |
-| `anti-patterns` | Common frontend anti-patterns to avoid during implementation and review |
-| `component-library` | Conventions and usage patterns for the project's component library |
-| `styling` | Styling rules, design token usage, and CSS/class naming conventions |
+| Skill | Preloaded Into | Description |
+|---|---|---|
+| [anti-patterns](skills/anti-patterns/SKILL.md) | implementation, reviewer, bug-fixer | React anti-pattern enforcement, self-review checklist, linting gates |
+| [accessibility](skills/accessibility/SKILL.md) | implementation, reviewer | WCAG 2.1 AA requirements: semantic HTML, keyboard nav, ARIA, forms |
+| [component-library](skills/component-library/SKILL.md) | implementation | Radix UI usage, project wrapper lookup, responsive breakpoint guidance |
+| [styling](skills/styling/SKILL.md) | implementation, reviewer | Design token config, className merging utility, cross-module style compatibility |
+| [performance](skills/performance/SKILL.md) | implementation, reviewer | Memoization (when to and when not to), virtualization, code splitting, bundle impact |
+| [error-handling](skills/error-handling/SKILL.md) | implementation, reviewer, bug-fixer | Three-states rule, error boundaries, fetch patterns, retry logic, logging conventions |
+
+---
 
 ## Refs
 
-Reference documents available to agents for project-specific context.
+Reference documents agents load on-demand for detailed guidance.
 
-| Ref | Description |
-|---|---|
-| `typescript` | TypeScript patterns, type conventions, and project-specific TS guidelines |
+| Ref | Used By | Description |
+|---|---|---|
+| [typescript](refs/typescript.md) | implementation, reviewer | TypeScript strict mode rules, type conventions, discriminated unions, exhaustive checks |
 
 ---
 
@@ -95,31 +103,46 @@ Reference documents available to agents for project-specific context.
 
 **Model tiers are intentional.** Haiku runs the orchestrator — it's fast and cheap for coordination tasks that don't need deep reasoning. Sonnet handles the heavy lifting (analysis, implementation, testing). Opus is reserved for the final review pass where quality judgment matters most.
 
+**The analyst owns convention discovery.** The analyst produces a Project Conventions table (export style, className utility, data fetching pattern, test runner, etc.) with evidence citations. Every downstream agent reads this table rather than rediscovering conventions independently.
+
 **Read-only agents prevent scope creep.** The analyst and reviewer can't write code. This keeps their output objective and prevents them from silently "fixing" things that should be flagged instead.
+
+**Skills replace inline rules.** Detailed guidance lives in preloaded skill files rather than repeated across agent prompts. Agents stay concise; skills stay authoritative.
 
 **Parallel execution for independent components.** When 3 or more components have no dependencies on each other, the implementation agent spawns parallel sub-agents per group. This keeps the pipeline fast on larger feature specs.
 
-**The re-plan loop has a hard cap.** P0/P1 issues trigger a scoped re-run of implementation, lint, test, and review — but only twice. After that, unresolved issues are surfaced to the user rather than looping indefinitely. Keeps the pipeline from spinning.
+**The re-plan loop has a hard cap.** P0/P1 issues trigger a scoped re-run of implementation, lint, test, and review — but only twice. After that, unresolved issues are surfaced to the user rather than looping indefinitely.
+
+**The bug-fixer is intentionally separate.** The implementation agent is wired for feature work — it scaffolds, classifies, and runs the full checklist. A bug fix needs the opposite: read first, minimum change, no refactoring. Keeping them separate prevents over-engineering simple fixes.
 
 **Lessons are captured automatically.** After every run the orchestrator scans all reports for recurring patterns and appends them to `lessons.md`. The pipeline gets smarter over time without manual retros.
 
 ---
 
 ## Repo Structure
+
 ```
-├── orchestrator.md           # Orchestrator agent prompt
-├── component-analyst.md      # Analyst agent prompt
-├── component-implementation.md  # Implementation agent prompt
-├── component-test.md         # Test agent prompt
-├── code-reviewer.md          # Reviewer agent prompt
-├── CLAUDE.md                 # Claude Code project config
-├── skills/                   # Preloaded skill docs for agents
-├── refs/                     # Reference patterns and conventions
-└── ignore/                   # Files excluded from agent context
+├── orchestrator.md              # Pipeline coordinator
+├── component-analyst.md         # Convention discovery + component classification
+├── component-implementation.md  # Component implementation
+├── component-test.md            # Test writing + coverage
+├── code-reviewer.md             # Code review + merge verdict
+├── bug-fixer.md                 # Standalone bug diagnosis + fix
+├── CLAUDE.md                    # Repo conventions for Claude Code
+├── skills/
+│   ├── anti-patterns/           # React anti-patterns + self-review checklist
+│   ├── accessibility/           # WCAG 2.1 AA requirements
+│   ├── component-library/       # Radix UI + responsive guidance
+│   ├── styling/                 # Design tokens + className conventions
+│   ├── performance/             # Memoization, virtualization, code splitting
+│   └── error-handling/          # Error boundaries, fetch patterns, logging
+├── refs/
+│   └── typescript.md            # TypeScript strict mode conventions
+└── ignore/                      # Scratch files excluded from agent context
 ```
 
 ---
 
 ## Stack
 
-Claude Code · claude-haiku · claude-sonnet · claude-opus · TypeScript · React · ESLint · Jest
+Claude Code · claude-haiku · claude-sonnet · claude-opus · TypeScript · React · ESLint · Jest / Vitest
