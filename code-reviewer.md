@@ -8,7 +8,7 @@ description: >
 model: opus
 permissionMode: plan
 memory: project
-maxTurns: 35
+maxTurns: 15
 tools:
   - Glob
   - Grep

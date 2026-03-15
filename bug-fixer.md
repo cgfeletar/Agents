@@ -6,7 +6,7 @@ description: >
   verifies no regressions. Use for fixing broken behavior in existing
   components — not for building new features.
 model: sonnet
-maxTurns: 40
+maxTurns: 20
 tools:
   - Read
   - Grep

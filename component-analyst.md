@@ -8,7 +8,7 @@ description: >
 model: sonnet
 permissionMode: plan
 memory: project
-maxTurns: 30
+maxTurns: 15
 tools:
   - Read
   - Grep

@@ -6,7 +6,7 @@ description: >
   code that is clean, DRY, readable, accessible, performant, and testable.
   Follows existing project patterns and avoids common React anti-patterns.
 model: sonnet
-maxTurns: 50
+maxTurns: 25
 tools:
   - Read
   - Grep
