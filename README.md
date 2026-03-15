@@ -64,12 +64,12 @@ flowchart TD
 
 | Agent                                                   | Model         | Max Turns | Role                                                                                | Write Access |
 | ------------------------------------------------------- | ------------- | --------- | ----------------------------------------------------------------------------------- | ------------ |
-| [orchestrator](orchestrator.md)                         | claude-haiku  | —  | Coordinates pipeline, manages state, runs lint/TS gate                              | Yes          |
-| [component-analyst](component-analyst.md)               | claude-sonnet | 15 | Discovers project conventions, classifies components as REUSE/ADAPT/WRITE NEW       | No           |
-| [component-implementation](component-implementation.md) | claude-sonnet | 25 | Implements components per analyst report; runs parallel agents for independent work | Yes          |
-| [component-test](component-test.md)                     | claude-sonnet | 30 | Writes tests to 80% coverage, iterates until green                                  | Yes          |
-| [code-reviewer](code-reviewer.md)                       | claude-opus   | 15 | 6-phase audit; issues merge readiness verdict                                       | No           |
-| [bug-fixer](bug-fixer.md)                               | claude-sonnet | 20 | Reproduces bugs, finds root cause, makes minimum fix                                | Yes          |
+| [orchestrator](orchestrator.md)                         | claude-haiku  | —         | Coordinates pipeline, manages state, runs lint/TS gate                              | Yes          |
+| [component-analyst](component-analyst.md)               | claude-sonnet | 15        | Discovers project conventions, classifies components as REUSE/ADAPT/WRITE NEW       | No           |
+| [component-implementation](component-implementation.md) | claude-sonnet | 25        | Implements components per analyst report; runs parallel agents for independent work | Yes          |
+| [component-test](component-test.md)                     | claude-sonnet | 30        | Writes tests to 80% coverage, iterates until green                                  | Yes          |
+| [code-reviewer](code-reviewer.md)                       | claude-opus   | 15        | 6-phase audit; issues merge readiness verdict                                       | No           |
+| [bug-fixer](bug-fixer.md)                               | claude-sonnet | 20        | Reproduces bugs, finds root cause, makes minimum fix                                | Yes          |
 
 ---
 
@@ -85,6 +85,7 @@ Preloaded into agents at startup — Claude has access to all rules without need
 | [styling](skills/styling/SKILL.md)                     | implementation, reviewer            | Design token config, className merging utility, cross-module style compatibility      |
 | [performance](skills/performance/SKILL.md)             | implementation, reviewer            | Memoization (when to and when not to), virtualization, code splitting, bundle impact  |
 | [error-handling](skills/error-handling/SKILL.md)       | implementation, reviewer, bug-fixer | Three-states rule, error boundaries, fetch patterns, retry logic, logging conventions |
+| [git](skills/git/SKILL.md)                             | — (user-invocable: `/git`)          | Injects staged diff + recent log, writes a commit message matching project style      |
 
 ---
 
@@ -100,7 +101,7 @@ Reference documents agents load on-demand for detailed guidance.
 
 ## Design Decisions
 
-**Model tiers are intentional.** Haiku runs the orchestrator — it's fast and cheap for coordination tasks that don't need deep reasoning. Sonnet handles the heavy lifting (analysis, implementation, testing). Opus is reserved for the final review pass where quality judgment matters most.
+**Model tiers are intentional.** Haiku runs the orchestrator - it's fast and cheap for coordination tasks that don't need deep reasoning. Sonnet handles the heavy lifting (analysis, implementation, testing). Opus is reserved for the final review pass where quality judgment matters most.
 
 **The analyst owns convention discovery.** The analyst produces a Project Conventions table (export style, className utility, data fetching pattern, test runner, etc.) with evidence citations. Every downstream agent reads this table rather than rediscovering conventions independently.
 
