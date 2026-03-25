@@ -70,6 +70,8 @@ flowchart TD
 | [component-test](component-test.md)                     | claude-sonnet | 30        | Writes tests to 80% coverage, iterates until green                                  | Yes          |
 | [code-reviewer](code-reviewer.md)                       | claude-opus   | 15        | 6-phase audit; issues merge readiness verdict                                       | No           |
 | [bug-fixer](bug-fixer.md)                               | claude-sonnet | 20        | Reproduces bugs, finds root cause, makes minimum fix                                | Yes          |
+| [data-layer](data-layer.md)                             | claude-sonnet | 25        | Validates API response types, audits query config, tests transforms                 | Yes          |
+| [data-viz-reviewer](data-viz-reviewer.md)               | claude-opus   | 15        | Audits chart correctness, performance, accessibility, responsiveness                | No           |
 
 ---
 
@@ -80,10 +82,10 @@ Preloaded into agents at startup — Claude has access to all rules without need
 | Skill                                                  | Preloaded Into                      | Description                                                                           |
 | ------------------------------------------------------ | ----------------------------------- | ------------------------------------------------------------------------------------- |
 | [anti-patterns](skills/anti-patterns/SKILL.md)         | implementation, reviewer, bug-fixer | React anti-pattern enforcement, self-review checklist, linting gates                  |
-| [accessibility](skills/accessibility/SKILL.md)         | implementation, reviewer            | WCAG 2.1 AA requirements: semantic HTML, keyboard nav, ARIA, forms                    |
+| [accessibility](skills/accessibility/SKILL.md)         | implementation, reviewer, data-viz-reviewer | WCAG 2.1 AA requirements: semantic HTML, keyboard nav, ARIA, forms                    |
 | [component-library](skills/component-library/SKILL.md) | implementation                      | Radix UI usage, project wrapper lookup, responsive breakpoint guidance                |
 | [styling](skills/styling/SKILL.md)                     | implementation, reviewer            | Design token config, className merging utility, cross-module style compatibility      |
-| [performance](skills/performance/SKILL.md)             | implementation, reviewer            | Memoization (when to and when not to), virtualization, code splitting, bundle impact  |
+| [performance](skills/performance/SKILL.md)             | implementation, reviewer, data-viz-reviewer | Memoization (when to and when not to), virtualization, code splitting, bundle impact  |
 | [error-handling](skills/error-handling/SKILL.md)       | implementation, reviewer, bug-fixer | Three-states rule, error boundaries, fetch patterns, retry logic, logging conventions |
 | [git](skills/git/SKILL.md)                             | — (user-invocable: `/git`)          | Injects staged diff + recent log, writes a commit message matching project style      |
 
@@ -117,6 +119,8 @@ Reference documents agents load on-demand for detailed guidance.
 
 **Lessons are captured automatically.** After every run the orchestrator scans all reports for recurring patterns and appends them to `lessons.md`. The pipeline gets smarter over time without manual retros.
 
+**Data-layer and data-viz agents are standalone.** They run independently of the component pipeline — invoke them directly when adding API hooks, modifying query config, or building visualizations. The data-layer agent writes (types, tests for transforms); the data-viz-reviewer is read-only (flags issues with a merge verdict, like the code-reviewer). Their scopes are explicitly non-overlapping: data-layer owns the fetch/transform contract, data-viz-reviewer owns the rendered chart.
+
 ---
 
 ## Repo Structure
@@ -128,6 +132,8 @@ Reference documents agents load on-demand for detailed guidance.
 ├── component-test.md            # Test writing + coverage
 ├── code-reviewer.md             # Code review + merge verdict
 ├── bug-fixer.md                 # Standalone bug diagnosis + fix
+├── data-layer.md                # API type validation + query config audit
+├── data-viz-reviewer.md         # Chart correctness + perf + a11y review
 ├── CLAUDE.md                    # Repo conventions for Claude Code
 ├── skills/
 │   ├── anti-patterns/           # React anti-patterns + self-review checklist
