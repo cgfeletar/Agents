@@ -72,6 +72,7 @@ flowchart TD
 | [bug-fixer](bug-fixer.md)                               | claude-sonnet | 20        | Reproduces bugs, finds root cause, makes minimum fix                                | Yes          |
 | [data-layer](data-layer.md)                             | claude-sonnet | 25        | Validates API response types, audits query config, tests transforms                 | Yes          |
 | [data-viz-reviewer](data-viz-reviewer.md)               | claude-opus   | 15        | Audits chart correctness, performance, accessibility, responsiveness                | No           |
+| [seo](seo.md)                                           | claude-sonnet | 30        | Audits and implements technical SEO, on-page SEO, structured data, and GEO/AEO signals | Yes          |
 
 ---
 
@@ -121,6 +122,8 @@ Reference documents agents load on-demand for detailed guidance.
 
 **Data-layer and data-viz agents are standalone.** They run independently of the component pipeline — invoke them directly when adding API hooks, modifying query config, or building visualizations. The data-layer agent writes (types, tests for transforms); the data-viz-reviewer is read-only (flags issues with a merge verdict, like the code-reviewer). Their scopes are explicitly non-overlapping: data-layer owns the fetch/transform contract, data-viz-reviewer owns the rendered chart.
 
+**The SEO agent covers both search engines and AI answer engines.** It runs independently of the component pipeline and audits/implements technical SEO (Core Web Vitals, crawlability, sitemaps), on-page SEO (titles, meta, semantic HTML), structured data (JSON-LD), and Generative Engine Optimization signals (llms.txt, citation-ready content structure, authority markers). It writes meta tags, schema, and crawl directives but defers product decisions (keywords, copy, AI crawler policy) back to the user.
+
 ---
 
 ## Repo Structure
@@ -134,6 +137,7 @@ Reference documents agents load on-demand for detailed guidance.
 ├── bug-fixer.md                 # Standalone bug diagnosis + fix
 ├── data-layer.md                # API type validation + query config audit
 ├── data-viz-reviewer.md         # Chart correctness + perf + a11y review
+├── seo.md                       # Technical/on-page SEO + structured data + GEO/AEO
 ├── CLAUDE.md                    # Repo conventions for Claude Code
 ├── skills/
 │   ├── anti-patterns/           # React anti-patterns + self-review checklist
